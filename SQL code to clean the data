@@ -1,0 +1,365 @@
+CREATE TABLE avocado_prices(
+    Entry_ID INT PRIMARY KEY,
+    DATES DATE,
+    AveragePrice DECIMAL(3,2),
+    Total_Volume DECIMAL (14,2),
+    Small INT,
+    Large INT,
+    Xlarge INT,
+    Total_Bags INT,
+    Small_Bags INT,
+    Large_Bags INT,
+    XLarge_Bags INT, 
+    type VARCHAR(20),
+    yearz YEAR,
+    region VARCHAR (25)
+);
+
+SHOW GLOBAL VARIABLES LIKE 'local_infile';
+SET GLOBAL local_infile = 'ON';
+SHOW GLOBAL VARIABLES LIKE 'local_infile';
+
+SHOW GLOBAL VARIABLES LIKE 'secure-file-priv';
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.0/Uploads/avocado.csv'
+  INTO TABLE avocado_prices
+  FIELDS TERMINATED BY ',';
+
+SHOW VARIABLES LIKE 'secure-file-priv';
+
+LOAD DATA INFILE 'C:/ProgramData/MySQL/MySQL Server 9.0/Uploads/avocado.csv'
+  INTO TABLE avocado_prices
+  FIELDS TERMINATED BY ','
+  IGNORE 1 LINES;
+
+--I want to start condensing data. I am going to use the data from 'total us' 
+--and take the sum of each year to create one graphic for the three years
+--then I'm gonna do the same thing by region and I am going to add this into 
+--two smaller graphs
+
+CREATE TABLE price_over_years(
+    the_years YEAR PRIMARY KEY,
+    average_price_small DECIMAL (4,2),
+    average_price_large DECIMAL (4,2),
+    average_price_xlarge DECIMAL (4,2)
+);
+
+SELECT *
+FROM price_over_years;
+
+ALTER TABLE price_over_years
+RENAME COLUMN average_price_small to average_sold_small;
+
+ALTER TABLE price_over_years
+RENAME COLUMN average_price_large to average_sold_large;
+
+ALTER TABLE price_over_years
+RENAME COLUMN average_price_xlarge to average_sold_xlarge;
+
+SELECT *
+FROM price_over_years;
+
+ALTER TABLE price_over_years
+ADD COLUMN average_price_of_one DECIMAL (4,2);
+
+SELECT *
+FROM price_over_years;
+
+SELECT *
+FROM avocado_prices;
+
+SELECT AVG(AveragePrice)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2015%';
+
+SELECT AVG(AveragePrice)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2016%';
+
+SELECT AVG(AveragePrice)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2017%';
+
+SELECT AVG(AveragePrice)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2018%';
+
+INSERT INTO price_over_years(the_years, average_price_of_one) VALUES (2015, 1.25);
+INSERT INTO price_over_years(the_years, average_price_of_one) VALUES (2016, 1.26);
+INSERT INTO price_over_years(the_years, average_price_of_one) VALUES (2017, 1.43);
+INSERT INTO price_over_years(the_years, average_price_of_one) VALUES (2018, 1.31);
+
+SELECT *
+FROM price_over_years;
+
+SELECT SUM(Small)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2015%';
+
+SELECT SUM(Large)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2015%';
+
+SELECT SUM(Xlarge)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2015%';
+
+ALTER TABLE price_over_years
+MODIFY COLUMN average_sold_small INT;
+
+ALTER TABLE price_over_years
+MODIFY COLUMN average_sold_large INT;
+
+ALTER TABLE price_over_years
+MODIFY COLUMN average_sold_xlarge INT;
+
+
+UPDATE price_over_years
+SET average_sold_small = 651907844, average_sold_large = 661188490, average_sold_xlarge = 53609412
+WHERE the_years = 2015;
+
+SELECT *
+FROM price_over_years;
+
+SELECT SUM(Small)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2016%';
+
+SELECT SUM(Large)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2016%';
+
+SELECT SUM(Xlarge)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2016%';
+
+UPDATE price_over_years
+SET average_sold_small = 588946682, average_sold_large = 625637617, average_sold_xlarge = 60427019
+WHERE the_years = 2016;
+
+SELECT SUM(Small)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2017%';
+
+SELECT SUM(Large)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2017%';
+
+SELECT SUM(Xlarge)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2017%';
+
+UPDATE price_over_years
+SET average_sold_small = 636377170, average_sold_large = 577034460, average_sold_xlarge = 33606062
+WHERE the_years = 2017;
+
+SELECT SUM(Small)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2018%';
+
+SELECT SUM(Large)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2018%';
+
+SELECT SUM(Xlarge)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2018%';
+
+UPDATE price_over_years
+SET average_sold_small = 177704534, average_sold_large = 151151005, average_sold_xlarge = 8532694
+WHERE the_years = 2018;
+
+SELECT *
+FROM price_over_years;
+
+ALTER TABLE price_over_years
+ADD COLUMN total_sold INT;
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2015%';
+
+UPDATE price_over_years
+SET total_sold = 1657255221
+WHERE the_years = 2015;
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2016%';
+
+UPDATE price_over_years
+SET total_sold = 1819159143
+WHERE the_years = 2016;
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2017%';
+
+UPDATE price_over_years
+SET total_sold = 1864693563
+WHERE the_years = 2017;
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2018%';
+
+UPDATE price_over_years
+SET total_sold = 523632254
+WHERE the_years = 2018;
+
+SELECT *
+FROM price_over_years;
+
+ALTER TABLE price_over_years
+RENAME COLUMN average_sold_small to total_sold_small;
+
+ALTER TABLE price_over_years
+RENAME COLUMN average_sold_large to total_sold_large;
+
+ALTER TABLE price_over_years
+RENAME COLUMN average_sold_xlarge to total_sold_xlarge;
+
+SELECT *
+FROM price_over_years;
+
+CREATE TABLE amount_sold_by_region(
+    the_years_2 YEAR PRIMARY KEY,
+    total_greatlakes INT,
+    total_northeast INT,
+    total_south_central INT,
+    total_south_east INT,
+    total_west INT
+);
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%GreatLakes%' AND DATES LIKE '%2015%';
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%Northeast%' AND DATES LIKE '%2015%';
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%SouthCentral%' AND DATES LIKE '%2015%';
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%Southeast%' AND DATES LIKE '%2015%';
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%West%' AND DATES LIKE '%2015%'
+EXCEPT
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE'%WestTexNewMexico%' AND DATES LIKE '%2015%';
+
+INSERT INTO amount_sold_by_region VALUES (2015, 169387975, 203378986, 290454594, 160095209, 346194318);
+
+SELECT *
+FROM amount_sold_by_region;
+
+SELECT SUM(Total_Volume)
+FROM avocado_prices
+WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2015%';
+
+ALTER TABLE amount_sold_by_region
+ADD COLUMN total_sold INT;
+
+SELECT *
+FROM amount_sold_by_region;
+
+UPDATE amount_sold_by_region
+SET total_sold = 1657255221
+WHERE the_years_2 = 2015;
+
+SELECT *
+FROM amount_sold_by_region;
+
+INSERT INTO amount_sold_by_region VALUES (2016, 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%GreatLakes%' AND DATES LIKE '%2016%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%Northeast%' AND DATES LIKE '%2016%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%SouthCentral%' AND DATES LIKE '%2016%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%Southeast%' AND DATES LIKE '%2016%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%West%' AND DATES LIKE '%2016%'
+    EXCEPT
+    SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE'%WestTexNewMexico%' AND DATES LIKE '%2016%'),
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2016%')
+);
+
+SELECT *
+FROM amount_sold_by_region;
+
+SELECT *
+FROM price_over_years;
+
+INSERT INTO amount_sold_by_region VALUES (2017, 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%GreatLakes%' AND DATES LIKE '%2017%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%Northeast%' AND DATES LIKE '%2017%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%SouthCentral%' AND DATES LIKE '%2017%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%Southeast%' AND DATES LIKE '%2017%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%West%' AND DATES LIKE '%2017%'
+    EXCEPT
+    SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE'%WestTexNewMexico%' AND DATES LIKE '%2017%'),
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2017%')
+);
+
+INSERT INTO amount_sold_by_region VALUES (2018, 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%GreatLakes%' AND DATES LIKE '%2018%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%Northeast%' AND DATES LIKE '%2018%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%SouthCentral%' AND DATES LIKE '%2018%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%Southeast%' AND DATES LIKE '%2018%'), 
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%West%' AND DATES LIKE '%2018%'
+    EXCEPT
+    SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE'%WestTexNewMexico%' AND DATES LIKE '%2018%'),
+    (SELECT SUM(Total_Volume)
+    FROM avocado_prices
+    WHERE region LIKE '%TotalUS%' AND DATES LIKE '%2018%')
+);
+
+SELECT *
+FROM amount_sold_by_region;
+
+SELECT *
+FROM price_over_years;
